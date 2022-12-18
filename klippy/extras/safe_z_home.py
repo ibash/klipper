@@ -16,6 +16,7 @@ class SafeZHoming:
         self.max_z = zconfig.getfloat('position_max', note_valid=False)
         self.speed = config.getfloat('speed', 50.0, above=0.)
         self.move_to_previous = config.getboolean('move_to_previous', False)
+        self.in_script = False
         self.printer.load_object(config, 'homing')
         self.gcode = self.printer.lookup_object('gcode')
         logging.info("SAFE Z HOME REGISTER 1")
