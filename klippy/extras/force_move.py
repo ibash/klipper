@@ -139,7 +139,7 @@ class ForceMove:
         toolhead = self.printer.lookup_object('toolhead')
         if hasattr(toolhead.get_kinematics(), "note_z_not_homed"):
             toolhead.get_kinematics().note_z_not_homed()
-        else
+        else:
             raise self.printer.config_error("Kinematics does not support setting Z not homed")
 
 def load_config(config):
