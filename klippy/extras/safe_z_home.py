@@ -18,7 +18,9 @@ class SafeZHoming:
         self.move_to_previous = config.getboolean('move_to_previous', False)
         self.printer.load_object(config, 'homing')
         self.gcode = self.printer.lookup_object('gcode')
+        logging.info("SAFE Z HOME REGISTER 1")
         self.prev_G28 = self.gcode.register_command("G28", None)
+        logging.info("SAFE Z HOME REGISTER 2")
         self.gcode.register_command("G28", self.cmd_G28)
 
         # if config.has_section("homing_override"):
@@ -26,6 +28,11 @@ class SafeZHoming:
                                # +" be used simultaneously")
 
     def cmd_G28(self, gcmd):
+        if self.in_script:
+            # Was called recursively via homing override- invoke the real G28 command
+            self.prev_G28(gcmd)
+            return
+
         logging.info("TOP OF SAFE Z HOME G28")
         toolhead = self.printer.lookup_object('toolhead')
 
@@ -65,7 +72,11 @@ class SafeZHoming:
             new_params['Y'] = '0'
         if new_params:
             g28_gcmd = self.gcode.create_gcode_command("G28", "G28", new_params)
-            self.prev_G28(g28_gcmd)
+            try:
+                self.in_script = True
+                self.prev_G28(g28_gcmd)
+            finally:
+                self.in_script = False
 
         # Home Z axis if necessary
         if need_z:
@@ -80,7 +91,11 @@ class SafeZHoming:
             toolhead.manual_move([self.home_x_pos, self.home_y_pos], self.speed)
             # Home Z
             g28_gcmd = self.gcode.create_gcode_command("G28", "G28", {'Z': '0'})
-            self.prev_G28(g28_gcmd)
+            try:
+                self.in_script = True
+                self.prev_G28(g28_gcmd)
+            finally:
+                self.in_script = False
             # Perform Z Hop again for pressure-based probes
             if self.z_hop:
                 pos = toolhead.get_position()

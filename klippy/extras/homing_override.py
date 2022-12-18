@@ -16,8 +16,11 @@ class HomingOverride:
         self.in_script = False
         self.printer.load_object(config, 'homing')
         self.gcode = self.printer.lookup_object('gcode')
+        logging.info("HOMING OVERRIDE REGISTER 1")
         self.prev_G28 = self.gcode.register_command("G28", None)
+        logging.info("HOMING OVERRIDE REGISTER 2")
         self.gcode.register_command("G28", self.cmd_G28)
+
     def cmd_G28(self, gcmd):
         logging.info("TOP OF HOMING OVERRIDE G28")
         if self.in_script:
