@@ -1,3 +1,4 @@
+import logging
 # Run user defined actions in place of a normal G28 homing command
 #
 # Copyright (C) 2018  Kevin O'Connor <kevin@koconnor.net>
@@ -18,10 +19,14 @@ class HomingOverride:
         self.prev_G28 = self.gcode.register_command("G28", None)
         self.gcode.register_command("G28", self.cmd_G28)
     def cmd_G28(self, gcmd):
+        logging.info("TOP OF HOMING OVERRIDE G28")
         if self.in_script:
+            logging.info("HOMING OVERRIDE: CALLING PREV G28")
             # Was called recursively - invoke the real G28 command
             self.prev_G28(gcmd)
             return
+
+        logging.info("HOMING OVERRIDE: CALLING SCRIPT")
 
         # if no axis is given as parameter we assume the override
         no_axis = True

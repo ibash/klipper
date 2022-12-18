@@ -1,3 +1,4 @@
+import logging
 # Perform Z Homing at specific XY coordinates.
 #
 # Copyright (C) 2019 Florian Heilmann <Florian.Heilmann@gmx.net>
@@ -25,6 +26,7 @@ class SafeZHoming:
                                # +" be used simultaneously")
 
     def cmd_G28(self, gcmd):
+        logging.info("TOP OF SAFE Z HOME G28")
         toolhead = self.printer.lookup_object('toolhead')
 
         # Perform Z Hop if necessary
@@ -35,6 +37,7 @@ class SafeZHoming:
             pos = toolhead.get_position()
 
             if 'z' not in kin_status['homed_axes']:
+                logging.info("Z HOP 1")
                 # Always perform the z_hop if the Z axis is not homed
                 pos[2] = 0
                 toolhead.set_position(pos, homing_axes=[2])
@@ -43,6 +46,7 @@ class SafeZHoming:
                 if hasattr(toolhead.get_kinematics(), "note_z_not_homed"):
                     toolhead.get_kinematics().note_z_not_homed()
             elif pos[2] < self.z_hop:
+                logging.info("Z HOP 2")
                 # If the Z axis is homed, and below z_hop, lift it to z_hop
                 toolhead.manual_move([None, None, self.z_hop],
                                      self.z_hop_speed)
