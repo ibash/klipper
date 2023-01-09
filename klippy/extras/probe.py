@@ -366,7 +366,7 @@ class ProbePointsHelper:
         self.speed = config.getfloat('speed', 50., above=0.)
         self.use_offsets = False
         # Internal probing state
-        self.lift_speed = self.speed
+        self.lift_speed = config.getfloat('lift_speed', self.speed, above=0.)
         self.probe_offsets = (0., 0., 0.)
         self.results = []
     def minimum_points(self,n):
