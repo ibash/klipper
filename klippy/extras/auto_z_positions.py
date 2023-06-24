@@ -41,7 +41,13 @@ class AutoZPositions:
         z_positions = asyncio.run(self.auto_z_positions(gcmd))
         gcmd.respond_info("z positions: %s" % z_positions)
 
-        # TODO(ibash) store results for auto save, see pid_calibrate
+        # TODO(ibash) add probe offset to z_positions
+
+        # TODO(ibash) test this
+        configfile = self.printer.lookup_object('configfile')
+        lines = ["%.4f, %.4f" % (p.x, p.y) for p in z_positions]
+        "\n".join(lines)
+        configfile.set('z_tilt', 'z_positions', "\n".join(lines))
 
     cmd_PROBE_PLANE_help = "Probe a single plane for debugging purposes"
     def cmd_PROBE_PLANE(self, gcmd):
